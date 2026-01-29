@@ -1,7 +1,14 @@
 "use client";
 import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { CheckCircle, Loader2, Brain, Target, Pencil, CheckSquare } from "lucide-react";
+import {
+  CheckCircle,
+  Loader2,
+  Brain,
+  Target,
+  Pencil,
+  CheckSquare,
+} from "lucide-react";
 
 export interface AgentStep {
   id: string;
@@ -17,7 +24,10 @@ interface AIAgentProgressProps {
   currentStep: number;
 }
 
-export const AIAgentProgress: React.FC<AIAgentProgressProps> = ({ steps, currentStep }) => {
+export const AIAgentProgress: React.FC<AIAgentProgressProps> = ({
+  steps,
+  currentStep,
+}) => {
   return (
     <div className="bg-white rounded-xl shadow-lg p-6 border border-purple-200">
       <div className="flex items-center gap-3 mb-6">
@@ -37,7 +47,9 @@ export const AIAgentProgress: React.FC<AIAgentProgressProps> = ({ steps, current
         </div>
         <div>
           <h3 className="text-xl font-bold text-gray-900">AI Agents Working</h3>
-          <p className="text-sm text-gray-600">Multi-agent analysis in progress...</p>
+          <p className="text-sm text-gray-600">
+            Multi-agent analysis in progress...
+          </p>
         </div>
       </div>
 
@@ -52,10 +64,10 @@ export const AIAgentProgress: React.FC<AIAgentProgressProps> = ({ steps, current
               step.status === "complete"
                 ? "bg-green-50 border-green-500"
                 : step.status === "in-progress"
-                ? "bg-purple-50 border-purple-500"
-                : step.status === "error"
-                ? "bg-red-50 border-red-500"
-                : "bg-gray-50 border-gray-300"
+                  ? "bg-purple-50 border-purple-500"
+                  : step.status === "error"
+                    ? "bg-red-50 border-red-500"
+                    : "bg-gray-50 border-gray-300"
             }`}
           >
             {/* Icon */}
@@ -85,12 +97,16 @@ export const AIAgentProgress: React.FC<AIAgentProgressProps> = ({ steps, current
             {/* Content */}
             <div className="flex-1 min-w-0">
               <div className="flex items-center justify-between mb-1">
-                <h4 className="text-sm font-semibold text-gray-900">{step.name}</h4>
+                <h4 className="text-sm font-semibold text-gray-900">
+                  {step.name}
+                </h4>
                 {step.duration && (
-                  <span className="text-xs text-gray-500">{step.duration}ms</span>
+                  <span className="text-xs text-gray-500">
+                    {step.duration}ms
+                  </span>
                 )}
               </div>
-              
+
               {/* Progress bar for in-progress */}
               {step.status === "in-progress" && (
                 <motion.div
@@ -102,7 +118,11 @@ export const AIAgentProgress: React.FC<AIAgentProgressProps> = ({ steps, current
                     className="bg-purple-600 h-full"
                     initial={{ width: "0%" }}
                     animate={{ width: "100%" }}
-                    transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+                    transition={{
+                      duration: 3,
+                      repeat: Infinity,
+                      ease: "linear",
+                    }}
                   />
                 </motion.div>
               )}
@@ -153,17 +173,20 @@ export const AIAgentProgress: React.FC<AIAgentProgressProps> = ({ steps, current
       {/* Overall Progress */}
       <div className="mt-6 pt-4 border-t border-gray-200">
         <div className="flex justify-between items-center mb-2">
-          <span className="text-sm font-medium text-gray-700">Overall Progress</span>
+          <span className="text-sm font-medium text-gray-700">
+            Overall Progress
+          </span>
           <span className="text-sm font-semibold text-purple-600">
-            {steps.filter(s => s.status === "complete").length} / {steps.length}
+            {steps.filter((s) => s.status === "complete").length} /{" "}
+            {steps.length}
           </span>
         </div>
         <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
           <motion.div
             className="bg-gradient-to-r from-purple-500 to-purple-600 h-full"
             initial={{ width: "0%" }}
-            animate={{ 
-              width: `${(steps.filter(s => s.status === "complete").length / steps.length) * 100}%` 
+            animate={{
+              width: `${(steps.filter((s) => s.status === "complete").length / steps.length) * 100}%`,
             }}
             transition={{ duration: 0.5, ease: "easeOut" }}
           />

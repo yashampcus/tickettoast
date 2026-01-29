@@ -37,7 +37,7 @@ Analyze and return ONLY valid JSON in this exact format:
 }`;
 
     const response = await this.model.invoke(prompt);
-    
+
     try {
       // Extract JSON from response (in case there's extra text)
       const jsonMatch = response.match(/\{[\s\S]*\}/);

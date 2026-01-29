@@ -21,7 +21,11 @@ import {
 import { MultiStepLoader } from "./ui/multi-step-loader";
 import { FileUpload } from "./ui/file-upload";
 import { GlowingEffect } from "./ui/glowing-effect";
-import { AIAgentProgress, getDefaultAgentSteps, type AgentStep } from "./ui/ai-agent-progress";
+import {
+  AIAgentProgress,
+  getDefaultAgentSteps,
+  type AgentStep,
+} from "./ui/ai-agent-progress";
 
 interface ExtractedField {
   label: string;
@@ -69,38 +73,40 @@ export const DocumentUpload: React.FC = () => {
   const [formFillResult, setFormFillResult] = useState<any>(null);
   const [isGeneratingAppeal, setIsGeneratingAppeal] = useState(false);
   const [aiAppeal, setAiAppeal] = useState<any>(null);
-  const [sessionId, setSessionId] = useState<string>('');
-  const [agentSteps, setAgentSteps] = useState<AgentStep[]>(getDefaultAgentSteps());
+  const [sessionId, setSessionId] = useState<string>("");
+  const [agentSteps, setAgentSteps] = useState<AgentStep[]>(
+    getDefaultAgentSteps(),
+  );
   const [showAgentProgress, setShowAgentProgress] = useState(false);
 
   // Check localStorage on mount and when view changes (for history load)
   React.useEffect(() => {
     const loadFromStorage = () => {
-      const savedResult = localStorage.getItem('tickettoast-result');
-      const savedAiAppeal = localStorage.getItem('tickettoast-ai-appeal');
-      const savedFormFill = localStorage.getItem('tickettoast-form-fill');
-      
+      const savedResult = localStorage.getItem("tickettoast-result");
+      const savedAiAppeal = localStorage.getItem("tickettoast-ai-appeal");
+      const savedFormFill = localStorage.getItem("tickettoast-form-fill");
+
       if (savedResult) {
         try {
           setResult(JSON.parse(savedResult));
         } catch (e) {
-          console.error('Failed to load saved result:', e);
+          console.error("Failed to load saved result:", e);
         }
       }
-      
+
       if (savedAiAppeal) {
         try {
           setAiAppeal(JSON.parse(savedAiAppeal));
         } catch (e) {
-          console.error('Failed to load saved AI appeal:', e);
+          console.error("Failed to load saved AI appeal:", e);
         }
       }
-      
+
       if (savedFormFill) {
         try {
           setFormFillResult(JSON.parse(savedFormFill));
         } catch (e) {
-          console.error('Failed to load saved form fill:', e);
+          console.error("Failed to load saved form fill:", e);
         }
       }
     };
@@ -113,8 +119,8 @@ export const DocumentUpload: React.FC = () => {
       loadFromStorage();
     };
 
-    window.addEventListener('historyLoaded', handleHistoryLoad);
-    return () => window.removeEventListener('historyLoaded', handleHistoryLoad);
+    window.addEventListener("historyLoaded", handleHistoryLoad);
+    return () => window.removeEventListener("historyLoaded", handleHistoryLoad);
   }, []);
 
   const handleFileChange = useCallback((files: File[]) => {
@@ -144,7 +150,7 @@ export const DocumentUpload: React.FC = () => {
     setIsProcessing(true);
     setError(null);
     setErrorDetails(null);
-    
+
     // Generate new session ID for this processing
     const newSessionId = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
     setSessionId(newSessionId);
@@ -167,7 +173,7 @@ export const DocumentUpload: React.FC = () => {
         if (errorData.error === "Custom Extraction Processor Schema Missing") {
           setErrorDetails(errorData);
           throw new Error(
-            "Processor configuration required - see details below"
+            "Processor configuration required - see details below",
           );
         }
 
@@ -181,24 +187,27 @@ export const DocumentUpload: React.FC = () => {
         extractedFields: data.extractedFields || [],
         processingTime,
       };
-      
+
       setResult(resultData);
-      
+
       // Save to localStorage
-      localStorage.setItem('tickettoast-result', JSON.stringify(resultData));
-      
+      localStorage.setItem("tickettoast-result", JSON.stringify(resultData));
+
       // Save to history
       const historyItem = {
         id: newSessionId,
         timestamp: Date.now(),
         result: resultData,
       };
-      localStorage.setItem(`tickettoast-history-${newSessionId}`, JSON.stringify(historyItem));
+      localStorage.setItem(
+        `tickettoast-history-${newSessionId}`,
+        JSON.stringify(historyItem),
+      );
     } catch (err) {
       setError(
         err instanceof Error
           ? err.message
-          : "An error occurred while processing the document"
+          : "An error occurred while processing the document",
       );
     } finally {
       setIsProcessing(false);
@@ -225,11 +234,11 @@ export const DocumentUpload: React.FC = () => {
     setFormFillResult(null);
     setIsGeneratingAppeal(false);
     setAiAppeal(null);
-    
+
     // Clear localStorage
-    localStorage.removeItem('tickettoast-result');
-    localStorage.removeItem('tickettoast-ai-appeal');
-    localStorage.removeItem('tickettoast-form-fill');
+    localStorage.removeItem("tickettoast-result");
+    localStorage.removeItem("tickettoast-ai-appeal");
+    localStorage.removeItem("tickettoast-form-fill");
   };
 
   const generateAIAppeal = async () => {
@@ -267,7 +276,7 @@ export const DocumentUpload: React.FC = () => {
 
       while (true) {
         const { done, value } = await reader.read();
-        
+
         if (done) break;
 
         buffer += decoder.decode(value, { stream: true });
@@ -286,36 +295,40 @@ export const DocumentUpload: React.FC = () => {
 
             if (eventType === "progress") {
               // Update the specific step
-              setAgentSteps(steps => steps.map(s => {
-                if (s.id === data.step) {
-                  if (data.status === "in-progress") {
-                    return { ...s, status: "in-progress" as const };
-                  } else if (data.status === "complete") {
-                    let resultPreview: any;
-                    
-                    if (data.step === "analyst") {
-                      resultPreview = {
-                        status: data.result.appealability,
-                        count: data.result.violationType
-                      };
-                    } else if (data.step === "strategist") {
-                      resultPreview = { count: `${data.result.length} strategies` };
-                    } else if (data.step === "writer") {
-                      resultPreview = `${data.result.length} characters`;
-                    } else if (data.step === "reviewer") {
-                      resultPreview = { score: data.result.score };
-                    }
+              setAgentSteps((steps) =>
+                steps.map((s) => {
+                  if (s.id === data.step) {
+                    if (data.status === "in-progress") {
+                      return { ...s, status: "in-progress" as const };
+                    } else if (data.status === "complete") {
+                      let resultPreview: any;
 
-                    return {
-                      ...s,
-                      status: "complete" as const,
-                      result: resultPreview,
-                      duration: data.duration
-                    };
+                      if (data.step === "analyst") {
+                        resultPreview = {
+                          status: data.result.appealability,
+                          count: data.result.violationType,
+                        };
+                      } else if (data.step === "strategist") {
+                        resultPreview = {
+                          count: `${data.result.length} strategies`,
+                        };
+                      } else if (data.step === "writer") {
+                        resultPreview = `${data.result.length} characters`;
+                      } else if (data.step === "reviewer") {
+                        resultPreview = { score: data.result.score };
+                      }
+
+                      return {
+                        ...s,
+                        status: "complete" as const,
+                        result: resultPreview,
+                        duration: data.duration,
+                      };
+                    }
                   }
-                }
-                return s;
-              }));
+                  return s;
+                }),
+              );
             } else if (eventType === "complete") {
               finalData = data;
             } else if (eventType === "error") {
@@ -326,14 +339,17 @@ export const DocumentUpload: React.FC = () => {
       }
 
       // Wait a moment before showing final results
-      await new Promise(resolve => setTimeout(resolve, 800));
+      await new Promise((resolve) => setTimeout(resolve, 800));
 
       if (finalData) {
         setAiAppeal(finalData);
         setShowAgentProgress(false);
 
         // Save to localStorage
-        localStorage.setItem('tickettoast-ai-appeal', JSON.stringify(finalData));
+        localStorage.setItem(
+          "tickettoast-ai-appeal",
+          JSON.stringify(finalData),
+        );
 
         // Update history with AI appeal
         if (sessionId) {
@@ -347,15 +363,17 @@ export const DocumentUpload: React.FC = () => {
         }
       }
     } catch (err) {
-      setAgentSteps(steps => steps.map(s => 
-        s.status === 'in-progress' ? { ...s, status: 'error' as const } : s
-      ));
+      setAgentSteps((steps) =>
+        steps.map((s) =>
+          s.status === "in-progress" ? { ...s, status: "error" as const } : s,
+        ),
+      );
       setError(
         err instanceof Error
           ? err.message
-          : "An error occurred while generating appeal"
+          : "An error occurred while generating appeal",
       );
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      await new Promise((resolve) => setTimeout(resolve, 2000));
       setShowAgentProgress(false);
     } finally {
       setIsGeneratingAppeal(false);
@@ -386,10 +404,10 @@ export const DocumentUpload: React.FC = () => {
 
       const data = await response.json();
       setFormFillResult(data);
-      
+
       // Save to localStorage
-      localStorage.setItem('tickettoast-form-fill', JSON.stringify(data));
-      
+      localStorage.setItem("tickettoast-form-fill", JSON.stringify(data));
+
       // Update history with form fill
       if (sessionId) {
         const historyKey = `tickettoast-history-${sessionId}`;
@@ -404,7 +422,7 @@ export const DocumentUpload: React.FC = () => {
       setError(
         err instanceof Error
           ? err.message
-          : "An error occurred while filling the form"
+          : "An error occurred while filling the form",
       );
     } finally {
       setIsFillingForm(false);
@@ -716,7 +734,7 @@ export const DocumentUpload: React.FC = () => {
                             </p>
                           )}
                         </div>
-                      )
+                      ),
                     )}
                   </div>
                 </div>
@@ -773,7 +791,12 @@ export const DocumentUpload: React.FC = () => {
       {/* AI Agent Progress */}
       {showAgentProgress && (
         <div className="animate-fadeIn">
-          <AIAgentProgress steps={agentSteps} currentStep={agentSteps.findIndex(s => s.status === 'in-progress')} />
+          <AIAgentProgress
+            steps={agentSteps}
+            currentStep={agentSteps.findIndex(
+              (s) => s.status === "in-progress",
+            )}
+          />
         </div>
       )}
 
@@ -799,7 +822,10 @@ export const DocumentUpload: React.FC = () => {
           <div className="p-6 bg-gray-50">
             {/* Citation Analysis */}
             {aiAppeal.analysis && (
-              <div className="mb-6 animate-fadeIn" style={{ animationDelay: '0.1s' }}>
+              <div
+                className="mb-6 animate-fadeIn"
+                style={{ animationDelay: "0.1s" }}
+              >
                 <div className="flex items-center gap-2 mb-4">
                   <BarChart3 className="w-5 h-5 text-gray-900" />
                   <h4 className="text-xl font-bold text-gray-900">
@@ -809,25 +835,33 @@ export const DocumentUpload: React.FC = () => {
                 <div className="bg-white rounded-lg p-5 shadow-sm border border-gray-200">
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <p className="text-sm text-gray-600 font-medium">Completeness</p>
+                      <p className="text-sm text-gray-600 font-medium">
+                        Completeness
+                      </p>
                       <p className="text-lg font-bold text-gray-900 capitalize">
                         {aiAppeal.analysis.completeness}
                       </p>
                     </div>
                     <div>
-                      <p className="text-sm text-gray-600 font-medium">Violation Type</p>
+                      <p className="text-sm text-gray-600 font-medium">
+                        Violation Type
+                      </p>
                       <p className="text-lg font-bold text-gray-900">
                         {aiAppeal.analysis.violationType}
                       </p>
                     </div>
                     <div>
-                      <p className="text-sm text-gray-600 font-medium">Severity</p>
+                      <p className="text-sm text-gray-600 font-medium">
+                        Severity
+                      </p>
                       <p className="text-lg font-bold text-gray-900 capitalize">
                         {aiAppeal.analysis.severity}
                       </p>
                     </div>
                     <div>
-                      <p className="text-sm text-gray-600 font-medium">Appealability</p>
+                      <p className="text-sm text-gray-600 font-medium">
+                        Appealability
+                      </p>
                       <p className="text-lg font-bold text-gray-900 capitalize">
                         {aiAppeal.analysis.appealability}
                       </p>
@@ -846,7 +880,10 @@ export const DocumentUpload: React.FC = () => {
 
             {/* Appeal Strategies */}
             {aiAppeal.strategies && aiAppeal.strategies.length > 0 && (
-              <div className="mb-6 animate-fadeIn" style={{ animationDelay: '0.3s' }}>
+              <div
+                className="mb-6 animate-fadeIn"
+                style={{ animationDelay: "0.3s" }}
+              >
                 <div className="flex items-center gap-2 mb-4">
                   <Target className="w-5 h-5 text-gray-900" />
                   <h4 className="text-xl font-bold text-gray-900">
@@ -880,7 +917,7 @@ export const DocumentUpload: React.FC = () => {
                               {strategy.keyArguments.map(
                                 (arg: string, i: number) => (
                                   <li key={i}>{arg}</li>
-                                )
+                                ),
                               )}
                             </ul>
                           </div>
@@ -895,7 +932,7 @@ export const DocumentUpload: React.FC = () => {
                               {strategy.requiredEvidence.map(
                                 (evidence: string, i: number) => (
                                   <li key={i}>{evidence}</li>
-                                )
+                                ),
                               )}
                             </ul>
                           </div>
@@ -908,7 +945,10 @@ export const DocumentUpload: React.FC = () => {
 
             {/* Appeal Letter */}
             {aiAppeal.appealLetter && (
-              <div className="mb-6 animate-fadeIn" style={{ animationDelay: '0.5s' }}>
+              <div
+                className="mb-6 animate-fadeIn"
+                style={{ animationDelay: "0.5s" }}
+              >
                 <div className="flex items-center gap-2 mb-4">
                   <PenTool className="w-5 h-5 text-gray-900" />
                   <h4 className="text-xl font-bold text-gray-900">
@@ -939,7 +979,10 @@ export const DocumentUpload: React.FC = () => {
 
             {/* Review */}
             {aiAppeal.review && (
-              <div className="mb-6 animate-fadeIn" style={{ animationDelay: '0.7s' }}>
+              <div
+                className="mb-6 animate-fadeIn"
+                style={{ animationDelay: "0.7s" }}
+              >
                 <div className="flex items-center gap-2 mb-4">
                   <Award className="w-5 h-5 text-gray-900" />
                   <h4 className="text-xl font-bold text-gray-900">
@@ -952,7 +995,9 @@ export const DocumentUpload: React.FC = () => {
                       <p className="text-4xl font-bold text-purple-600">
                         {aiAppeal.review.score}
                       </p>
-                      <p className="text-xs text-gray-600 font-medium mt-1">Quality Score</p>
+                      <p className="text-xs text-gray-600 font-medium mt-1">
+                        Quality Score
+                      </p>
                     </div>
                     <div className="flex-1">
                       <div className="w-full bg-gray-200 rounded-full h-3">
@@ -974,7 +1019,7 @@ export const DocumentUpload: React.FC = () => {
                           {aiAppeal.review.strengths.map(
                             (strength: string, i: number) => (
                               <li key={i}>{strength}</li>
-                            )
+                            ),
                           )}
                         </ul>
                       </div>
@@ -990,14 +1035,17 @@ export const DocumentUpload: React.FC = () => {
                           {aiAppeal.review.improvements.map(
                             (improvement: string, i: number) => (
                               <li key={i}>{improvement}</li>
-                            )
+                            ),
                           )}
                         </ul>
                       </div>
                     )}
                   {aiAppeal.review.recommendation && (
                     <p className="text-sm text-gray-800 italic mt-3 pt-3 border-t border-gray-200 bg-blue-50 rounded p-3">
-                      <span className="font-semibold text-blue-900">Recommendation:</span> {aiAppeal.review.recommendation}
+                      <span className="font-semibold text-blue-900">
+                        Recommendation:
+                      </span>{" "}
+                      {aiAppeal.review.recommendation}
                     </p>
                   )}
                 </div>
@@ -1006,9 +1054,16 @@ export const DocumentUpload: React.FC = () => {
 
             {/* Metadata */}
             {aiAppeal.metadata && (
-              <div className="text-center text-sm text-gray-600 bg-purple-50 rounded-lg p-3 animate-fadeIn flex items-center justify-center gap-2" style={{ animationDelay: '0.9s' }}>
+              <div
+                className="text-center text-sm text-gray-600 bg-purple-50 rounded-lg p-3 animate-fadeIn flex items-center justify-center gap-2"
+                style={{ animationDelay: "0.9s" }}
+              >
                 <Sparkles className="w-4 h-4" />
-                Powered by <span className="font-semibold">{aiAppeal.metadata.model}</span> • Free & Private • Saved Locally
+                Powered by{" "}
+                <span className="font-semibold">
+                  {aiAppeal.metadata.model}
+                </span>{" "}
+                • Free & Private • Saved Locally
               </div>
             )}
           </div>

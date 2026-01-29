@@ -14,7 +14,7 @@ export class WriterAgent {
   async generateAppeal(
     extractedFields: any[],
     strategy: any,
-    userContext?: string
+    userContext?: string,
   ) {
     const prompt = `You are a professional legal writer specializing in parking ticket appeals.
 

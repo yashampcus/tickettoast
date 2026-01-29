@@ -11,17 +11,20 @@ This guide will help you set up the free, local AI appeal generation system usin
 ## Step 1: Install Ollama
 
 ### Option A: Windows Installer (Recommended)
+
 1. Go to https://ollama.ai/download
 2. Download the Windows installer
 3. Run the installer and follow prompts
 4. Ollama will start automatically
 
 ### Option B: Command Line
+
 ```bash
 winget install Ollama.Ollama
 ```
 
 ### Verify Installation
+
 ```bash
 ollama --version
 ```
@@ -72,11 +75,13 @@ Keep this terminal window open while using the app.
 ## Step 6: Test the Setup
 
 ### Test Ollama Directly
+
 ```bash
 ollama run llama3.1 "Write a brief parking ticket appeal."
 ```
 
 ### Test via API
+
 ```bash
 curl http://localhost:11434/api/generate -d "{\"model\": \"llama3.1\", \"prompt\": \"Hello\"}"
 ```
@@ -88,6 +93,7 @@ npm run dev
 ```
 
 Navigate to http://localhost:3002 and:
+
 1. Upload a parking citation
 2. Process the document
 3. Click "Generate AI Appeal"
@@ -95,6 +101,7 @@ Navigate to http://localhost:3002 and:
 ## Usage
 
 ### Workflow
+
 1. **Upload** parking citation (PDF, JPG, PNG)
 2. **Extract** fields using Google Cloud Document AI
 3. **Generate AI Appeal** using local Ollama models
@@ -132,14 +139,15 @@ The system uses 4 specialized AI agents:
 
 ## Model Comparison
 
-| Model | Size | Speed | Quality | RAM Needed |
-|-------|------|-------|---------|------------|
-| llama3.1 | 4.7GB | Medium | High | 8GB |
-| mistral | 4.1GB | Fast | Good | 8GB |
-| phi3 | 2.3GB | Very Fast | Decent | 4GB |
-| llama3.1:70b | 40GB | Slow | Excellent | 32GB |
+| Model        | Size  | Speed     | Quality   | RAM Needed |
+| ------------ | ----- | --------- | --------- | ---------- |
+| llama3.1     | 4.7GB | Medium    | High      | 8GB        |
+| mistral      | 4.1GB | Fast      | Good      | 8GB        |
+| phi3         | 2.3GB | Very Fast | Decent    | 4GB        |
+| llama3.1:70b | 40GB  | Slow      | Excellent | 32GB       |
 
 ### Recommended Model
+
 - **Development**: `phi3` (fast iteration)
 - **Production**: `llama3.1` (best quality)
 - **High-end**: `llama3.1:70b` (if you have the hardware)
@@ -149,11 +157,13 @@ The system uses 4 specialized AI agents:
 To use a different model:
 
 1. Pull the model:
+
 ```bash
 ollama pull mistral
 ```
 
 2. Update `.env`:
+
 ```env
 OLLAMA_MODEL=mistral
 ```
@@ -163,26 +173,31 @@ OLLAMA_MODEL=mistral
 ## Troubleshooting
 
 ### "Ollama not found" Error
+
 - Make sure Ollama is installed: `ollama --version`
 - Restart your terminal
 - Check PATH: Ollama should be in `C:\Users\<username>\AppData\Local\Programs\Ollama`
 
 ### "Connection refused" Error
+
 - Start Ollama server: `ollama serve`
 - Check if running: `curl http://localhost:11434`
 - Check firewall settings
 
 ### "Model not found" Error
+
 - Pull the model: `ollama pull llama3.1`
 - Verify: `ollama list`
 
 ### Slow Generation
+
 - Use a smaller model: `ollama pull phi3`
 - Close other applications
 - Ensure SSD for model storage
 - Consider using GPU acceleration
 
 ### Poor Quality Appeals
+
 - Use a larger model: `ollama pull llama3.1:70b`
 - Provide more citation details
 - Add user context in the appeal generation
@@ -197,24 +212,25 @@ OLLAMA_MODEL=mistral
 
 ## Cost Comparison
 
-| Service | Cost |
-|---------|------|
-| OpenAI GPT-4 | $0.03 per appeal (~$30/1000) |
-| Anthropic Claude | $0.015 per appeal (~$15/1000) |
-| **Ollama (Local)** | **$0.00 (FREE!)** |
+| Service            | Cost                          |
+| ------------------ | ----------------------------- |
+| OpenAI GPT-4       | $0.03 per appeal (~$30/1000)  |
+| Anthropic Claude   | $0.015 per appeal (~$15/1000) |
+| **Ollama (Local)** | **$0.00 (FREE!)**             |
 
 ## Privacy & Security
 
 ✅ **Completely Private**: Data never leaves your machine  
 ✅ **No API Keys**: No external services required  
 ✅ **Offline Capable**: Works without internet (after model download)  
-✅ **No Tracking**: No usage analytics or data collection  
+✅ **No Tracking**: No usage analytics or data collection
 
 ## Advanced Configuration
 
 ### Custom System Prompts
 
 Edit the agent files in `src/lib/agents/` to customize:
+
 - Analysis criteria
 - Appeal strategies
 - Writing style
@@ -223,6 +239,7 @@ Edit the agent files in `src/lib/agents/` to customize:
 ### Temperature Settings
 
 Adjust creativity/consistency in each agent:
+
 - **Lower (0.2-0.4)**: More consistent, factual
 - **Higher (0.7-0.9)**: More creative, varied
 
